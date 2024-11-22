@@ -8,7 +8,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 
-public class GestionFichier {
+public class FileManagement {
     private static final File PATH = new File(System.getProperty("user.home"), "diluvioclicker");
     private static final String ALGORITHM = "AES";
     private static final byte[] KEY = "!!DiluvioSecret!".getBytes();
@@ -19,42 +19,54 @@ public class GestionFichier {
         }
     }
 
-    public static Joueur readUser() {
+    public static Player readUser() {
         File userFile = new File(PATH, "user.dat");
         if (userFile.exists()) {
-            System.out.println("Lecture du fichier de l'utilisateur");
+            System.out.println("Reading the player saved file");
             try (CipherInputStream cis = new CipherInputStream(
                     new FileInputStream(userFile), getCipher(Cipher.DECRYPT_MODE));
                  ObjectInputStream ois = new ObjectInputStream(cis)) {
 
-                Joueur joueur = (Joueur) ois.readObject();
-                System.out.println("Joueur chargé : " + joueur);
-                return joueur;
+                Player player = (Player) ois.readObject();
+                System.out.println("Player loaded : " + player);
+                return player;
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
-                return new Joueur();
+                return createDefaultPlayer();
             }
             catch(Exception e ) {
-                return new Joueur();
+                return createDefaultPlayer();
             }
         } else {
-            System.out.println("Le fichier de l'utilisateur n'existe pas encore.");
-            writeUser(new Joueur());
-            return new Joueur();
+            System.out.println("The user.dat file doesn't already exist");
+            writeUser(new Player());
+            return createDefaultPlayer();
         }
     }
-
-    public static void writeUser(Joueur joueur) {
+    public static void deleteUser() {
+        File userFile = new File(PATH, "user.dat");
+        if (userFile.exists() && userFile.delete()) {
+            System.out.println("User file deleted successfully.");
+        } else {
+            System.err.println("Error: Unable to delete user file or file does not exist.");
+        }
+    }
+    public static void writeUser(Player player) {
         File userFile = new File(PATH, "user.dat");
         try (CipherOutputStream cos = new CipherOutputStream(
                 new FileOutputStream(userFile), getCipher(Cipher.ENCRYPT_MODE));
              ObjectOutputStream oos = new ObjectOutputStream(cos)) {
 
-            oos.writeObject(joueur);
-            System.out.println("Joueur sauvegardé : " + joueur);
+            oos.writeObject(player);
+            System.out.println("Player saved : " + player);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    private static Player createDefaultPlayer() {
+        Player defaultPlayer = new Player();
+        writeUser(defaultPlayer);
+        return defaultPlayer;
     }
 
     private static Cipher getCipher(int mode) {
@@ -64,7 +76,8 @@ public class GestionFichier {
             cipher.init(mode, secretKey);
             return cipher;
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de l'initialisation du chiffrement/déchiffrement", e);
+            throw new RuntimeException("Error while initializing the encryption/decryption", e);
         }
     }
+
 }

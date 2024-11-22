@@ -1,25 +1,26 @@
 package org.diluvioClient.Vue;
 
 import org.diluvioClient.Menu;
+import org.diluvioModels.LanguagesTranslations;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class TransitionPanel extends JPanel implements ActionListener {
+public class VueTransition extends JPanel implements ActionListener {
     private final JButton commencerButton;
     private final Menu menu;
 
-    public TransitionPanel(Menu menu) {
+    public VueTransition(Menu menu, LanguagesTranslations trans) {
         this.menu = menu;
 
 
         StyleUtils.stylePanel(this);
         this.setLayout(new GridBagLayout());
 
-        // Bouton Commencer
-        this.commencerButton = new JButton("Commencer");
+        // Beginning Button
+        this.commencerButton = new JButton(trans.translate("start"));
         StyleUtils.styleButton(commencerButton);
         commencerButton.setPreferredSize(new Dimension(300, 80));
         commencerButton.addActionListener(this);
