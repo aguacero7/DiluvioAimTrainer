@@ -1,10 +1,7 @@
 package org.diluvioClient;
 
 import org.diluvioClient.Vue.*;
-import org.diluvioModels.Game;
-import org.diluvioModels.FileManagement;
-import org.diluvioModels.LanguagesTranslations;
-import org.diluvioModels.Player;
+import org.diluvioModels.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,10 +9,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.spi.LocaleNameProvider;
 
 
-public class Menu extends JFrame implements ActionListener, WindowListener {
-    static String VERSION = "0.1";
+public class DiluvioClient extends JFrame implements ActionListener, WindowListener {
+    public static String VERSION = "0.1";
     public JPanel menu;
     int xSize;
     int ySize;
@@ -30,22 +28,26 @@ public class Menu extends JFrame implements ActionListener, WindowListener {
     VueGame vueGame;
     VueProfil vueProfil;
     LanguagesTranslations translations;
+    public static LocalSettings currentSettings;
 
-    Menu() {
-        this.xSize = 1280;
-        this.ySize = 720;
-        this.setSize(xSize, ySize);
-        this.setTitle("Diluvio Aim Trainer "+ VERSION);
+
+    DiluvioClient() {
+
+        this.setTitle("Diluvio Aim Trainer " + VERSION);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(this);
 
         this.menu = new JPanel();
         menu.setLayout(new BorderLayout());
         menu.setBackground(new Color(30, 30, 30)); // Arrière-plan sombre
-
+        this.currentSettings = FileManagement.readConf();
+        this.xSize = this.currentSettings.getFenetreDimension().width;
+        this.ySize = this.currentSettings.getFenetreDimension().height;
+        this.setSize(xSize, ySize);
         //Translantions Part
+
         translations = new LanguagesTranslations();
-        translations.setLanguage("en"); // must be loaded from local conf
+        translations.setLanguage(currentSettings.getLanguage());
 
 
         JLabel title = new JLabel("Diluvio Aim Trainer", JLabel.CENTER);
@@ -55,12 +57,13 @@ public class Menu extends JFrame implements ActionListener, WindowListener {
         menu.add(title, BorderLayout.NORTH);
 
         JPanel jpHaut = new JPanel();
-        jpHaut.setBackground(new Color(50, 50, 50)); // Bande grise en haut
+        jpHaut.setBackground(new Color(50, 50, 50));
         jpHaut.setLayout(new BorderLayout());
+        jpHaut.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         this.settingsButton = new JButton(translations.translate("settings"));
         StyleUtils.styleButton(settingsButton);
-        jpHaut.add(this.settingsButton,BorderLayout.WEST);
-        jpHaut.add(this.loginButton = new JButton(translations.translate("login")),BorderLayout.EAST);
+        jpHaut.add(this.settingsButton, BorderLayout.WEST);
+        jpHaut.add(this.loginButton = new JButton(translations.translate("login")), BorderLayout.EAST);
         StyleUtils.styleButton(loginButton);
         this.settingsButton.addActionListener(this);
         this.loginButton.addActionListener(this);
@@ -88,7 +91,6 @@ public class Menu extends JFrame implements ActionListener, WindowListener {
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Espacement
 
 
-
         this.profilButton = new JButton(translations.translate("see_profile"));
         StyleUtils.styleButton(profilButton);
         profilButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -104,43 +106,82 @@ public class Menu extends JFrame implements ActionListener, WindowListener {
 
     public static void main(String[] args) {
         Player j = FileManagement.readUser();
-        Menu m;
+        DiluvioClient m;
         if (!j.isPlayerAuthenticated()) {
-            m = new Menu();
+            m = new DiluvioClient();
             m.j = j;
         } else {
-            m = new Menu(); // #TODO change for an authenticated menu
+            m = new DiluvioClient(); // #TODO change for an authenticated menu
         }
     }
 
 
-
     public void resetMenu() {
-        this.setContentPane(menu);
+        this.setContentPane(this.menu);
         this.validate();
     }
+    private void updateComponentText(JComponent component, String oldLanguage) {
+        if (component instanceof JButton) {
+            JButton button = (JButton) component;
+            String oldText = button.getText();
+            String key = translations.reverseLookup(oldText,oldLanguage);
+            if (key != null) {
+                button.setText(translations.translate(key));
+            }
+        } else if (component instanceof JLabel) {
+            JLabel label = (JLabel) component;
+            String oldText = label.getText();
+            String key = translations.reverseLookup(oldText);
+            System.out.println(oldText+"  "+key);
+
+            if (key != null) {
+
+                label.setText(translations.translate(key));
+            }
+        }
+    }
+    private void refreshAllComponents(Container container,String oldLanguage) {
+        System.out.println("Old langiuage"+oldLanguage+"    new :"+this.translations.getCurrentLanguage());
+            for (Component component : container.getComponents()) {
+                if (component instanceof JComponent) {
+                    updateComponentText((JComponent) component, oldLanguage);
+                }
+                if (component instanceof Container) {
+                    refreshAllComponents((Container) component, oldLanguage); // Recurse for nested components
+                }
+            }
+        }
+
+    public void applySettings(String oldLanguage) {
+        this.translations.setLanguage(DiluvioClient.currentSettings.getLanguage());
+        this.setSize(DiluvioClient.currentSettings.getFenetreDimension());
+        refreshAllComponents(menu,oldLanguage);
+        resetMenu();
+    }
+
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == jouer) {
             // display transition screen
-            vueTransition = new VueTransition(this,this.translations);
+            vueTransition = new VueTransition(this, this.translations);
             this.setContentPane(vueTransition);
             this.validate();
         } else if (e.getSource() == profilButton) {
             // display player profile
-            vueProfil = new VueProfil(this, j,this.translations);
+            vueProfil = new VueProfil(this, j, this.translations);
             this.setContentPane(vueProfil);
             this.validate();
         } else if (e.getActionCommand().equals(this.translations.translate("home_button"))) {
             this.setContentPane(menu);
             this.validate();
-        }
-        else if (e.getActionCommand().equals(this.translations.translate("settings"))) {
+        } else if (e.getActionCommand().equals(this.translations.translate("settings"))) {
+            //display settings screen
+            this.vueSettings = new VueSettings(currentSettings,this,this.translations);
             this.setContentPane(vueSettings);
             this.validate();
-        }
-        else if (e.getActionCommand().equals(this.translations.translate("login"))) {
+        } else if (e.getActionCommand().equals(this.translations.translate("login"))) {
             System.out.println("AUTH TODO");
         }
     }
@@ -156,10 +197,10 @@ public class Menu extends JFrame implements ActionListener, WindowListener {
         JPanel jp = new JPanel(new BorderLayout());
         StyleUtils.stylePanel(jp);
 
-        JLabel pointsLabel = new JLabel(this.translations.translate("points")+" : " + points);
+        JLabel pointsLabel = new JLabel(this.translations.translate("points") + " : " + points);
         StyleUtils.styleLabel(pointsLabel, 24, Color.WHITE);
 
-        JLabel accuracyLabel = new JLabel(this.translations.translate("precision")+" : " + String.format("%.2f", accuracy) + " %");
+        JLabel accuracyLabel = new JLabel(this.translations.translate("precision") + " : " + String.format("%.2f", accuracy) + " %");
         StyleUtils.styleLabel(accuracyLabel, 24, Color.WHITE);
 
         JPanel infoPanel = new JPanel();
@@ -222,4 +263,5 @@ public class Menu extends JFrame implements ActionListener, WindowListener {
     @Override
     public void windowDeactivated(WindowEvent e) {
     }
+
 }

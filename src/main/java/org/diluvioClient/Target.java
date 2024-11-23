@@ -1,4 +1,5 @@
 package org.diluvioClient;
+
 //Target model
 public class Target {
     public static int size = 80; // default diameter

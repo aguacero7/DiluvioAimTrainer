@@ -1,6 +1,6 @@
 package org.diluvioClient.Vue;
 
-import org.diluvioClient.Menu;
+import org.diluvioClient.DiluvioClient;
 import org.diluvioModels.LanguagesTranslations;
 
 import javax.swing.*;
@@ -10,10 +10,10 @@ import java.awt.event.ActionListener;
 
 public class VueTransition extends JPanel implements ActionListener {
     private final JButton commencerButton;
-    private final Menu menu;
+    private final DiluvioClient diluvioClient;
 
-    public VueTransition(Menu menu, LanguagesTranslations trans) {
-        this.menu = menu;
+    public VueTransition(DiluvioClient diluvioClient, LanguagesTranslations trans) {
+        this.diluvioClient = diluvioClient;
 
 
         StyleUtils.stylePanel(this);
@@ -36,7 +36,7 @@ public class VueTransition extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == commencerButton) {
 
-            menu.lancerJeu();
+            diluvioClient.lancerJeu();
         }
     }
 }

@@ -1,7 +1,7 @@
 package org.diluvioModels;
 
+import org.diluvioClient.DiluvioClient;
 import org.diluvioClient.Target;
-import org.diluvioClient.Menu;
 
 public class Game implements Runnable{
     Target activeGame;
@@ -14,9 +14,9 @@ public class Game implements Runnable{
     int clickCount;
     String key;
     public boolean endedGame;
-    Menu menuref;
+    DiluvioClient menuref;
 
-    public Game(Menu m) {
+    public Game(DiluvioClient m) {
         this.key="";
         this.points = 0;
         this.clickedTargets = 0;
@@ -92,7 +92,7 @@ public class Game implements Runnable{
         this.endedGame = endedGame;
     }
 
-    public void setMenuref(Menu menuref) {
+    public void setMenuref(DiluvioClient menuref) {
         this.menuref = menuref;
     }
 
@@ -134,7 +134,7 @@ public class Game implements Runnable{
         return endedGame;
     }
 
-    public Menu getMenuref() {
+    public DiluvioClient getMenuref() {
         return menuref;
     }
 

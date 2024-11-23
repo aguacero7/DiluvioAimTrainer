@@ -1,4 +1,6 @@
 package org.diluvioModels;
+import org.diluvioClient.DiluvioClient;
+
 import javax.crypto.Cipher;
 
 
@@ -68,7 +70,55 @@ public class FileManagement {
         writeUser(defaultPlayer);
         return defaultPlayer;
     }
+    private static LocalSettings createDefaultConf() {
+        LocalSettings localSettings = new LocalSettings(DiluvioClient.VERSION);
+        writeConf(localSettings);
+        return localSettings;
+    }
+    public static void deleteConf() {
+        File confFile = new File(PATH, "conf.dat");
+        if (confFile.exists() && confFile.delete()) {
+            System.out.println("Configuration file deleted successfully.");
+        } else {
+            System.err.println("Error: Unable to delete configuration file or file does not exist.");
+        }
+    }
+    public static void writeConf(LocalSettings conf) {
+        File confFile = new File(PATH, "conf.dat");
+        try (CipherOutputStream cos = new CipherOutputStream(
+                new FileOutputStream(confFile), getCipher(Cipher.ENCRYPT_MODE));
+             ObjectOutputStream oos = new ObjectOutputStream(cos)) {
 
+            oos.writeObject(conf);
+            System.out.println("Conf saved : " + conf);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static LocalSettings readConf() {
+        File confFile = new File(PATH, "conf.dat");
+        if (confFile.exists()) {
+            System.out.println("Reading the configuration saved File");
+            try (CipherInputStream cis = new CipherInputStream(
+                    new FileInputStream(confFile), getCipher(Cipher.DECRYPT_MODE));
+                 ObjectInputStream ois = new ObjectInputStream(cis)) {
+
+                LocalSettings conf = (LocalSettings) ois.readObject();
+                System.out.println("Configuraion loaded : " + conf);
+                return conf;
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                return createDefaultConf();
+            }
+            catch(Exception e ) {
+                return createDefaultConf();
+            }
+        } else {
+            System.out.println("The user.dat file doesn't already exist");
+            writeUser(new Player());
+            return createDefaultConf();
+        }
+    }
     private static Cipher getCipher(int mode) {
         try {
             SecretKey secretKey = new SecretKeySpec(KEY, ALGORITHM);

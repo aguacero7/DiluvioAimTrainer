@@ -1,8 +1,8 @@
 package org.diluvioClient.Vue;
 
-import org.diluvioClient.Menu;
-import org.diluvioModels.Player;
+import org.diluvioClient.DiluvioClient;
 import org.diluvioModels.LanguagesTranslations;
+import org.diluvioModels.Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,13 +10,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class VueProfil extends JPanel implements ActionListener {
-    private final Menu menu;
+    private final DiluvioClient diluvioClient;
     private final Player player;
     private final JButton homeButton;
     private final LanguagesTranslations translations;
 
-    public VueProfil(Menu menu, Player player, LanguagesTranslations translations) {
-        this.menu = menu;
+    public VueProfil(DiluvioClient diluvioClient, Player player, LanguagesTranslations translations) {
+        this.diluvioClient = diluvioClient;
         this.player = player;
         this.translations = translations;
 
@@ -32,8 +32,8 @@ public class VueProfil extends JPanel implements ActionListener {
 
         add(createInfoLabel(translations.translate("name") + " : " + player.name));
         add(createInfoLabel(translations.translate("game_count") + " : " + player.getGameCount()));
-        add(createInfoLabel(translations.translate("average") + " : " + (player.getGameCount() > 0 ? player.getPointsAverage() : "N/A")));
-        add(createInfoLabel(translations.translate("accuracy_mean") + " : " + (player.getGameCount() > 0 ? player.getAccuracyAverage() : "N/A")));
+        add(createInfoLabel(translations.translate("average") + " : " + (player.getGameCount() > 0 ? player.getPointsAverage()+" "+translations.translate("points") : "N/A")));
+        add(createInfoLabel(translations.translate("accuracy_mean") + " : " + (player.getGameCount() > 0 ? Math.round(player.getAccuracyAverage())+"%" : "N/A")));
         add(createInfoLabel(translations.translate("creation_date") + " : " + player.getDateOfCreation()));
         add(createInfoLabel(translations.translate("status") + " : " + (player.isPlayerAuthenticated() ? translations.translate("connected") : translations.translate("disconnected"))));
 
@@ -65,8 +65,8 @@ public class VueProfil extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == homeButton) {
-            this.menu.setContentPane(this.menu.menu);
-            this.menu.revalidate();
+            this.diluvioClient.setContentPane(this.diluvioClient.menu);
+            this.diluvioClient.revalidate();
         }
     }
 }

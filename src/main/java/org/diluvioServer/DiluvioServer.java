@@ -2,7 +2,7 @@ package org.diluvioServer;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 import org.diluvioModels.*;
@@ -10,8 +10,8 @@ import org.diluvioModels.*;
 class ConnectedGame implements Runnable {
     private Game game;
     private Player player;
-    private Socket clientSocket;
-    private String key;
+    private final Socket clientSocket;
+    private final String key;
 
     ConnectedGame(Socket clientSocket) {
         this.game = new Game();
@@ -22,7 +22,7 @@ class ConnectedGame implements Runnable {
     public String genID(int size) {
         byte[] array = new byte[size];
         new Random().nextBytes(array);
-        return new String(array, Charset.forName("UTF-8"));
+        return new String(array, StandardCharsets.UTF_8);
     }
 
     @Override
@@ -56,23 +56,28 @@ class ConnectedGame implements Runnable {
     }
 }
 
-public class Server {
+public class DiluvioServer {
 
     public static void main(String[] args) {
-        try (ServerSocket serverSocket = new ServerSocket(1234)) {
-            System.out.println("Server started and waiting for connections...");
+        if (args.length >= 1) {
+            try (ServerSocket serverSocket = new ServerSocket(1234)) {
+                System.out.println("DiluvioServer started and waiting for connections...");
 
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected");
+                while (true) {
+                    Socket clientSocket = serverSocket.accept();
+                    System.out.println("Client connected");
 
-                // Création d'un nouveau game pour chaque client
-                ConnectedGame connectedGame = new ConnectedGame(clientSocket);
-                Thread thread = new Thread(connectedGame);
-                thread.start();
+                    // Création d'un nouveau game pour chaque client
+                    ConnectedGame connectedGame = new ConnectedGame(clientSocket);
+                    Thread thread = new Thread(connectedGame);
+                    thread.start();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            System.out.println("BAD USAGE - usage : java DiluvioServer {port} \n\n\tExample : java DiluvioServer 3450");
+            System.exit(256);
         }
     }
 }
