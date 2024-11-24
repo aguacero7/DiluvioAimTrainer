@@ -52,6 +52,8 @@ public class LanguagesTranslations {
         fr.put("fr", "Français");
         fr.put("en", "Anglais");
         fr.put("es", "Espagnol");
+        fr.put("remaining_time","Temps restant");
+
         translations.put("fr", fr);
 
         // English
@@ -84,6 +86,7 @@ public class LanguagesTranslations {
         en.put("fr", "French");
         en.put("en", "English");
         en.put("es", "Spanish");
+        en.put("remaining_time","Remaining Time");
         translations.put("en", en);
 
         //Spanish
@@ -116,6 +119,7 @@ public class LanguagesTranslations {
         es.put("fr", "Francés");
         es.put("en", "Inglés");
         es.put("es", "Español");
+        fr.put("remaining_time","Tiempo quedando");
         translations.put("es", es);
 
     }

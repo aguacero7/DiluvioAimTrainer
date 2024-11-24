@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class VueTransition extends JPanel implements ActionListener {
-    private final JButton commencerButton;
+    private final JButton beginButton;
     private final DiluvioClient diluvioClient;
 
     public VueTransition(DiluvioClient diluvioClient, LanguagesTranslations trans) {
@@ -20,21 +20,21 @@ public class VueTransition extends JPanel implements ActionListener {
         this.setLayout(new GridBagLayout());
 
         // Beginning Button
-        this.commencerButton = new JButton(trans.translate("start"));
-        StyleUtils.styleButton(commencerButton);
-        commencerButton.setPreferredSize(new Dimension(300, 80));
-        commencerButton.addActionListener(this);
-
+        this.beginButton = new JButton(trans.translate("start"));
+        StyleUtils.styleButton(beginButton);
+        beginButton.setPreferredSize(new Dimension(300, 80));
+        beginButton.addActionListener(this);
+        diluvioClient.setExtendedState(JFrame.MAXIMIZED_BOTH);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(20, 20, 20, 20);
-        this.add(commencerButton, gbc);
+        this.add(beginButton, gbc);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == commencerButton) {
+        if (e.getSource() == beginButton) {
 
             diluvioClient.lancerJeu();
         }

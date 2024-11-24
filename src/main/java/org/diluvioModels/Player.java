@@ -18,7 +18,7 @@ public class Player implements Serializable, Comparable<Player>{
         //New Player from scratch
         playerAuthenticated =false;
         name ="Anonymous";
-        dateOfCreation =new Date(0);
+        dateOfCreation =new Date();
         lastSynchro=null;
         gameCount =0;
         pointCount =0;
@@ -34,7 +34,7 @@ public class Player implements Serializable, Comparable<Player>{
         this.dateOfCreation = dateOfCreation;
         this.playerAuthenticated =true;
         this.total_accuracy=total_acc;
-        lastSynchro=new Date(0);
+        lastSynchro=new Date();
         this.id=id;
     }
     Player(String name, int gameCount, int pointCount, double total_acc){

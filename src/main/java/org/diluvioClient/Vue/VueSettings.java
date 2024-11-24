@@ -124,7 +124,9 @@ public class VueSettings extends JPanel implements ActionListener {
             int height = Integer.parseInt(dimensions[1]);
             Dimension selectedDimension = new Dimension(width, height);
             String oldLanguage = lng.getCurrentLanguage();
+
             DiluvioClient.currentSettings=new LocalSettings(DiluvioClient.VERSION,selectedLanguage,selectedTheme,selectedDimension);
+
             menuref.applySettings(oldLanguage);
             FileManagement.writeConf(DiluvioClient.currentSettings);
             menuref.resetMenu();

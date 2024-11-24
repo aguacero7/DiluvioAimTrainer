@@ -11,6 +11,10 @@ public class Target {
         this.y = y;
     }
 
+    public static void setSize(int newSize) {
+        size = newSize;
+    }
+
     public int getX() {
         return x;
     }
@@ -23,12 +27,10 @@ public class Target {
         return size;
     }
 
-    // Method to check if the click point is in the target range
     public boolean isClicked(int clicX, int clicY) {
         int rayon = size / 2;
         int centreX = x + rayon;
         int centreY = y + rayon;
         return Math.sqrt(Math.pow(clicX - centreX, 2) + Math.pow(clicY - centreY, 2)) <= rayon;
-
     }
 }

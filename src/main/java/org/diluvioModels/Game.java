@@ -2,8 +2,10 @@ package org.diluvioModels;
 
 import org.diluvioClient.DiluvioClient;
 import org.diluvioClient.Target;
+import org.diluvioClient.Vue.VueGame;
 
-public class Game implements Runnable{
+public class Game implements Runnable {
+    public boolean endedGame;
     Target activeGame;
     int targetCount;
     long chronoStart;
@@ -13,35 +15,35 @@ public class Game implements Runnable{
     int chronoMax;
     int clickCount;
     String key;
-    public boolean endedGame;
     DiluvioClient menuref;
+    VueGame vueGame;
 
     public Game(DiluvioClient m) {
-        this.key="";
+        this.key = "";
         this.points = 0;
         this.clickedTargets = 0;
-        this.chronoMax = 10000; // 60 seconds
-        this.clickCount =0;
+        this.chronoMax = 20000; // 20 seconds
+        this.clickCount = 0;
         this.chronoStart = System.currentTimeMillis();
         this.endedGame = false;
-        this.menuref=m;
+        this.vueGame = m.getVueGame();
+        this.menuref = m;
         Thread thread = new Thread(this);
         thread.start();
     }
+
     public Game() {
-        this.key="";
+        this.key = "";
         this.points = 0;
         this.clickedTargets = 0;
-        this.chronoMax = 10000; // 60 secondes
-        this.clickCount =0;
+        this.chronoMax = 20000; // 20 seconds
+        this.clickCount = 0;
         this.chronoStart = System.currentTimeMillis();
         this.endedGame = false;
         Thread thread = new Thread(this);
         thread.start();
     }
-    public void setKey(String key) {
-        this.key=key;
-    }
+
     public void clickTarget(int x, int y) {
         if (!endedGame) {
             points += 10;
@@ -53,57 +55,31 @@ public class Game implements Runnable{
         return points;
     }
 
-    public boolean isTimeFinished() {
-        long tempsEcoule = System.currentTimeMillis() - chronoStart;
-        return tempsEcoule >= chronoMax;
-    }
-
-
-    /*              Setters             */
-    public void setActiveGame(Target activeGame) {
-        this.activeGame = activeGame;
-    }
-
-    public void setTargetCount(int targetCount) {
-        this.targetCount = targetCount;
-    }
-
-    public void setCurrentChrono(long currentChrono) {
-        this.currentChrono = currentChrono;
-    }
-
     public void setPoints(int points) {
         this.points = points;
     }
 
-    public void setClickedTargets(int clickedTargets) {
-        this.clickedTargets = clickedTargets;
+    public boolean isTimeFinished() {
+        long tempsEcoule = System.currentTimeMillis() - chronoStart;
+        return tempsEcoule >= chronoMax;
     }
-
-    public void setChronoMax(int chronoMax) {
-        this.chronoMax = chronoMax;
-    }
-
-    public void setClickCount(int clickCount) {
-        this.clickCount = clickCount;
-    }
-
-    public void setEndedGame(boolean endedGame) {
-        this.endedGame = endedGame;
-    }
-
-    public void setMenuref(DiluvioClient menuref) {
-        this.menuref = menuref;
-    }
-
 
     /*              Getters             */
     public Target getActiveGame() {
         return activeGame;
     }
 
+    /*              Setters             */
+    public void setActiveGame(Target activeGame) {
+        this.activeGame = activeGame;
+    }
+
     public int getTargetCount() {
         return targetCount;
+    }
+
+    public void setTargetCount(int targetCount) {
+        this.targetCount = targetCount;
     }
 
     public long getChronoStart() {
@@ -114,52 +90,84 @@ public class Game implements Runnable{
         return currentChrono;
     }
 
+    public void setCurrentChrono(long currentChrono) {
+        this.currentChrono = currentChrono;
+    }
+
     public int getClickedTargets() {
         return clickedTargets;
+    }
+
+    public void setClickedTargets(int clickedTargets) {
+        this.clickedTargets = clickedTargets;
     }
 
     public int getChronoMax() {
         return chronoMax;
     }
 
+    public void setChronoMax(int chronoMax) {
+        this.chronoMax = chronoMax;
+    }
+
     public int getClickCount() {
         return clickCount;
+    }
+
+    public void setClickCount(int clickCount) {
+        this.clickCount = clickCount;
     }
 
     public String getKey() {
         return key;
     }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     public boolean isEndedGame() {
         return endedGame;
+    }
+
+    public void setEndedGame(boolean endedGame) {
+        this.endedGame = endedGame;
     }
 
     public DiluvioClient getMenuref() {
         return menuref;
     }
 
+    public void setMenuref(DiluvioClient menuref) {
+        this.menuref = menuref;
+    }
+
     @Override
     public void run() {
-        if(menuref==null) {
+        if (menuref == null) {
             while (!endedGame) {
                 if (isTimeFinished()) {
                     endedGame = true;
 
                 }
-
+                if (this.vueGame != null) {
+                    vueGame.updateInfoLabels();
+                }
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
-        }else {
+        } else {
             while (!endedGame) {
                 if (isTimeFinished()) {
                     endedGame = true;
                     menuref.gameOver();
                 }
-
+                if (this.vueGame != null) {
+                    vueGame.updateInfoLabels();
+                }
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -167,5 +175,9 @@ public class Game implements Runnable{
                 }
             }
         }
+    }
+
+    public void setVue(VueGame vueGame) {
+        this.vueGame = vueGame;
     }
 }
