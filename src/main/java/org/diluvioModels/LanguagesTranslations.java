@@ -119,7 +119,7 @@ public class LanguagesTranslations {
         es.put("fr", "Francés");
         es.put("en", "Inglés");
         es.put("es", "Español");
-        fr.put("remaining_time","Tiempo quedando");
+        es.put("remaining_time","Tiempo quedando");
         translations.put("es", es);
 
     }
