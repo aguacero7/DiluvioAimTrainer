@@ -116,7 +116,7 @@ public class LanguagesTranslations {
         es.put("theme.light", "Claro");
         es.put("theme.dark", "Oscuro");
         es.put("language", "Idioma");
-        es.put("fr", "Francés");
+        es.put("fr", "Francés");//testCI
         es.put("en", "Inglés");
         es.put("es", "Español");
         es.put("remaining_time","Tiempo quedando");
